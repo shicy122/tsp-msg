@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.hycan.idn</groupId>
+        <artifactId>tsp-common</artifactId>
+        <version>1.0.43-RELEASE</version>
+    </parent>
+
+    <artifactId>tsp-msg</artifactId>
+    <version>4.0.0</version>
+    <packaging>pom</packaging>
+
+    <!--项目子模块-->
+    <!--项目子模块-->
+    <modules>
+        <module>tsp-msg-api</module>
+        <module>tsp-msg-biz</module>
+    </modules>
+
+    <properties>
+        <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
+        <mongock.version>5.1.0</mongock.version>
+        <mongo-java-driver.version>3.8.2</mongo-java-driver.version>
+        <tsp-user-account-api.version>3.4.8-${suffix}</tsp-user-account-api.version>
+        <tsp-vms-api.version>4.0.12-${suffix}</tsp-vms-api.version>
+        <tsp-msg-api.version>3.5.2-${suffix}</tsp-msg-api.version>
+        <flyway-core.version>7.7.3</flyway-core.version>
+        <alibaba-druid.version>1.2.11</alibaba-druid.version>
+        <suffix>SNAPSHOT</suffix>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.mongock</groupId>
+                <artifactId>mongock-bom</artifactId>
+                <version>${mongock.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.ResourceConfigMapper">
+    
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.ResourceConfigEntity">
+        <result property="id" jdbcType="BIGINT" column="id"    />
+        <result property="resourceName" jdbcType="VARCHAR" column="resource_name"    />
+        <result property="resourceType" jdbcType="VARCHAR" column="resource_type"    />
+        <result property="resourceSize" jdbcType="BIGINT" column="resource_size"    />
+        <result property="resourceUrl" jdbcType="VARCHAR" column="resource_url"    />
+        <result property="source" jdbcType="VARCHAR" column="source"    />
+        <result property="status" jdbcType="VARCHAR" column="status"    />
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="updateTime" jdbcType="TIMESTAMP" column="update_time"/>
+        <result property="createBy" jdbcType="VARCHAR" column="create_by"/>
+        <result property="updateBy" jdbcType="VARCHAR" column="update_by"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, resource_name, resource_type, resource_size, resource_url, source, status, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="isExists" resultType="boolean" >
+        SELECT EXISTS(
+            SELECT 1 FROM resource_config WHERE resource_name = #{resource_name} AND resource_type = #{resource_type}
+        ) AS result
+    </select>
+
+    <update id="updateStatusById">
+        UPDATE resource_config SET status = #{status} WHERE id=#{id}
+    </update>
+
+    <select id="findPage" resultType="com.hycan.idn.tsp.message.pojo.resourceconfig.ResourceConfigRspVO">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM resource_config
+        WHERE 1 = 1
+        <if test="query.resourceName != null and '' neq query.resourceName">
+            AND resource_name = #{query.resourceName}
+        </if>
+        <if test="query.resourceType != null and '' neq query.resourceType">
+            AND resource_type = #{query.resourceType}
+        </if>
+        <if test="query.status != null and '' neq query.status">
+            AND status = #{query.status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findResourcesByBaseTaskId" resultType="com.hycan.idn.tsp.message.pojo.resourceconfig.ResourceConfigDTO">
+        SELECT trr.base_task_id, trr.resource_id, rc.resource_url, rc.resource_type, trr.is_illustration
+        FROM resource_config rc LEFT JOIN task_resource_relation trr ON rc.id = trr.resource_id
+        WHERE trr.base_task_id = #{base_task_id}
+    </select>
+
+    <select id="findResourcesByBaseTaskIds" resultType="com.hycan.idn.tsp.message.pojo.resourceconfig.ResourceConfigDTO">
+        SELECT trr.base_task_id, trr.resource_id, rc.resource_url, rc.resource_type, trr.is_illustration
+        FROM resource_config rc LEFT JOIN task_resource_relation trr ON rc.id = trr.resource_id
+        WHERE trr.base_task_id IN
+        <foreach collection="base_task_ids" item="base_task_id" open="(" separator="," close=")">
+            #{base_task_id}
+        </foreach>
+    </select>
+</mapper>

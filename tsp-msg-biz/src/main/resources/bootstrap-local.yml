@@ -1,0 +1,53 @@
+server:
+  port: 7012
+
+spring:
+  application:
+    name: @artifactId@
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:139.9.72.201}:${NACOS_PORT:30013}
+        # tspLocal namespace: 3ef11701-fbde-46d6-a758-d4becbd8ca53
+        namespace: 3ef11701-fbde-46d6-a758-d4becbd8ca53
+        group: DEFAULT_GROUP
+        username: nacos
+        password: hycan@_666
+      config:
+        username: ${spring.cloud.nacos.discovery.username}
+        password: ${spring.cloud.nacos.discovery.password}
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        file-extension: yml
+        shared-configs:
+          # 该公用配置文件存放不需要热更新的配置 如数据库连接配置
+          - data-id: application-dev.${spring.cloud.nacos.config.file-extension}
+            refresh: false
+          # 该公用配置文件存放需要热更新的配置 如公用业务配置
+          - data-id: application-refresh-dev.${spring.cloud.nacos.config.file-extension}
+            refresh: true
+        group: ${spring.cloud.nacos.discovery.group}
+        namespace: ${spring.cloud.nacos.discovery.namespace}
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  global-config:
+    db-config:
+      select-strategy: not_empty
+      insert-strategy: not_empty
+      update-strategy: not_empty
+feign:
+  skew:
+    domain: https://tsp-t.hycan.com.cn
+    enable: true
+    service:
+      url:
+        tsp-vms-biz: https://tsp-t.hycan.com.cn/tsp-api/vms
+        tsp-condition-biz: https://tsp-t.hycan.com.cn/tsp-api/condition
+        tsp-alarm-biz: https://tsp-t.hycan.com.cn/tsp-api/alarm-biz

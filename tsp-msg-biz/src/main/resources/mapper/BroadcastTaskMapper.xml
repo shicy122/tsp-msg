@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.BroadcastTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.BroadcastTaskEntity">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="baseTaskId" jdbcType="BIGINT" column="base_task_id"/>
+        <result property="execRate" jdbcType="VARCHAR" column="exec_rate"/>
+        <result property="holidayConfigId" jdbcType="BIGINT" column="holiday_config_id"/>
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="updateTime" jdbcType="TIMESTAMP" column="update_time"/>
+        <result property="createBy" jdbcType="VARCHAR" column="create_by"/>
+        <result property="updateBy" jdbcType="VARCHAR" column="update_by"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, base_task_id, exec_rate, holiday_config_id, create_time, update_time, create_by, update_by
+    </sql>
+
+    <select id="selectBaskTaskIdById" resultType="java.lang.Long">
+        SELECT base_task_id FROM broadcast_task_info WHERE id = #{id}
+    </select>
+
+    <select id="findPage" resultType="com.hycan.idn.tsp.message.pojo.broadcasttask.BroadcastTaskRspVO">
+        SELECT hti.id, hti.base_task_id, bti.task_name, bti.msg_content, bti.exec_policy, hti.exec_rate,
+        bti.status, bti.scope, hti.holiday_config_id, hc.holiday_name AS holiday_config_name,
+        hc.year AS holiday_year, bti.publish_time, bti.send_time, bti.cancel_time, bti.finish_time,
+        bti.create_time, bti.update_time, bti.create_by, bti.update_by
+        FROM broadcast_task_info hti
+        LEFT JOIN base_task_info bti ON hti.base_task_id = bti.id
+        LEFT JOIN holiday_config hc ON hti.holiday_config_id = hc.id
+        WHERE
+        1 = 1
+        <if test="query.taskName != null and query.taskName != ''">
+            AND bti.task_name LIKE concat('%', #{query.taskName}, '%')
+        </if>
+        <if test="query.status != null and query.status !=''">
+            AND bti.status = #{query.status}
+        </if>
+        <if test="query.startSendTime != null">
+            AND bti.send_time &gt;= #{query.startSendTime}
+        </if>
+        <if test="query.endSendTime != null">
+            AND bti.send_time &lt;= #{query.endSendTime}
+        </if>
+        ORDER BY bti.create_time DESC
+    </select>
+
+    <select id="isHolidayConfigRelationSendingTask" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM broadcast_task_info pti
+                              LEFT JOIN base_task_info tbi ON tbi.id = pti.base_task_id
+            WHERE 1 =1
+              AND pti.holiday_config_id = #{holiday_config_id}
+              AND tbi.status = 'SENDING'
+        ) AS result
+    </select>
+
+    <select id="isHolidayConfigRelationTask" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM broadcast_task_info pti
+                              LEFT JOIN base_task_info tbi ON tbi.id = pti.base_task_id
+            WHERE 1 = 1
+              AND pti.holiday_config_id = #{holiday_config_id}
+        ) AS result
+    </select>
+
+    <select id="findTaskRspById" resultType="com.hycan.idn.tsp.message.pojo.broadcasttask.BroadcastTaskRspVO">
+        SELECT hti.id, hti.base_task_id, bti.task_name, bti.msg_content, bti.exec_policy, hti.exec_rate,
+               bti.status, bti.scope, hti.holiday_config_id AS holiday_config_id, hc.holiday_name AS holiday_config_name,
+               hc.year AS holiday_year, bti.publish_time, bti.send_time, bti.cancel_time, bti.finish_time,
+               hti.create_time, hti.update_time, hti.create_by, hti.update_by
+        FROM broadcast_task_info hti
+                 LEFT JOIN base_task_info bti ON hti.base_task_id = bti.id
+                 LEFT JOIN holiday_config hc ON hti.holiday_config_id = hc.id
+        WHERE hti.id = #{id}
+        ORDER BY hti.create_time DESC
+    </select>
+
+    <select id="findPublishedTask" resultType="com.hycan.idn.tsp.message.pojo.publishtask.BroadcastTaskPublishedDTO">
+        SELECT hti.id AS broadcast_task_id, hti.base_task_id, bti.task_name, bti.msg_content, bti.msg_title,
+               bti.exec_policy, hti.exec_rate, bti.scope, hc.start_date, hc.end_date, hc.holiday_type
+        FROM broadcast_task_info hti
+                 LEFT JOIN base_task_info bti ON hti.base_task_id = bti.id
+                 LEFT JOIN holiday_config hc ON hti.holiday_config_id = hc.id
+        WHERE 1 = 1
+          AND bti.status = 'PUBLISHED' AND hc.status = 'ENABLE'
+          AND bti.task_type = 'BROADCAST'
+          AND hc.start_date &lt;= CURRENT_DATE
+          AND hc.end_date &gt;= CURRENT_DATE
+        ORDER BY bti.create_time DESC
+    </select>
+
+    <select id="findSendingBirthdayTask" resultType="java.lang.Long">
+        SELECT hti.base_task_id, hc.start_date, hc.end_date
+        FROM broadcast_task_info hti
+                 LEFT JOIN base_task_info bti ON hti.base_task_id = bti.id
+                 LEFT JOIN holiday_config hc ON hti.holiday_config_id = hc.id
+        WHERE 1 = 1
+          AND bti.status = 'SENDING' AND hc.status = 'ENABLE' AND hc.holiday_type = 'BIRTHDAY'
+          AND hc.start_date &lt;= CURRENT_DATE
+          AND hc.end_date &gt;= CURRENT_DATE
+        ORDER BY bti.create_time DESC
+    </select>
+</mapper>

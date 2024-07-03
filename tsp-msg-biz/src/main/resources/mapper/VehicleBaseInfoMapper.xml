@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.VehicleBaseInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.VehicleBaseInfoEntity">
+        <id property="id" jdbcType="BIGINT" column="id"/>
+        <result property="vin" jdbcType="VARCHAR" column="vin"/>
+        <result property="serialId" jdbcType="VARCHAR" column="serial_id"/>
+        <result property="mtId" jdbcType="VARCHAR" column="mt_id"/>
+        <result property="carModelMarket" jdbcType="VARCHAR" column="car_model_market"/>
+        <result property="serial" jdbcType="VARCHAR" column="serial"/>
+        <result property="mt" jdbcType="VARCHAR" column="mt"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        vin, serial_id,mt_id, serial, mt, car_model_market
+    </sql>
+
+    <select id="getVinBaseInfoByVin" resultType="com.hycan.idn.tsp.vms.params.inner.dto.msg.VehCarDTO">
+        SELECT vin,serial_id series_id,mt_id model_id,serial series_name,mt model_name, car_model_market FROM vehicle_base_info WHERE vin IN
+        <foreach collection="vins" index="index" item="vin" separator="," close=")" open="(">
+            #{vin}
+        </foreach>
+    </select>
+
+    <insert id="batchInsertOrUpdate">
+        INSERT INTO vehicle_base_info (id, vin, car_model_market, serial_id, serial, mt_id, mt)
+        VALUES
+        <foreach collection="list" item="item" separator="," >
+            (#{item.id}, #{item.vin}, #{item.carModelMarket}, #{item.serialId}, #{item.serial}, #{item.mtId}, #{item.mt})
+        </foreach>
+        ON CONFLICT (vin) DO UPDATE
+        SET
+        car_model_market = EXCLUDED.car_model_market,
+        serial_id = EXCLUDED.serial_id,
+        serial = EXCLUDED.serial,
+        mt_id = EXCLUDED.mt_id,
+        mt = EXCLUDED.mt;
+    </insert>
+</mapper>

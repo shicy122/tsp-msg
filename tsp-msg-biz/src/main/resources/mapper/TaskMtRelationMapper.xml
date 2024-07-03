@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.TaskMtRelationMapper">
+
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.TaskMtRelationEntity">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="baseTaskId" jdbcType="BIGINT" column="base_task_id"/>
+        <result property="mtId" jdbcType="BIGINT" column="mt_id"/>
+    </resultMap>
+
+    <insert id="batchInsertOrUpdate">
+        INSERT INTO task_mt_relation (id, base_task_id, mt_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.baseTaskId}, #{item.mtId})
+        </foreach>
+        ON CONFLICT (base_task_id, mt_id) DO NOTHING;
+    </insert>
+
+    <delete id="deleteByBaseTaskId">
+        DELETE FROM task_mt_relation WHERE base_task_id = #{base_task_id}
+    </delete>
+
+    <select id="findMtsByBaseTaskId" resultType="java.lang.Long">
+        SELECT mt_id FROM task_mt_relation WHERE base_task_id = #{base_task_id}
+    </select>
+
+</mapper>

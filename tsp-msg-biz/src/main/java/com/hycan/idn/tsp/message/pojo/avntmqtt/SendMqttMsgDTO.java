@@ -1,0 +1,43 @@
+package com.hycan.idn.tsp.message.pojo.avntmqtt;
+
+import com.hycan.idn.tsp.message.pojo.SendMsgDTO;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * MQTT信息数据
+ *
+ * @author Liuyingjie
+ * @datetime 2022/6/24 14:48
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class SendMqttMsgDTO {
+    /**
+     * 消息唯一id
+     */
+    private String id;
+    /**
+     * 发送时间
+     */
+    private Long sendTime;
+    /**
+     * 消息上报时间，统一使用毫秒时间戳
+     */
+    private Long reportTime;
+    /**
+     * 消息内容
+     */
+    private Object payload;
+
+    public static SendMqttMsgDTO of(SendMsgDTO msgDTO) {
+        SendMqttMsgDTO sendMqttMsgDTO = new SendMqttMsgDTO();
+        sendMqttMsgDTO.setId(msgDTO.getMsgId());
+        sendMqttMsgDTO.setReportTime(msgDTO.getReportTime());
+        sendMqttMsgDTO.setPayload(msgDTO.getPayload());
+        sendMqttMsgDTO.setSendTime(System.currentTimeMillis());
+        return sendMqttMsgDTO;
+    }
+}

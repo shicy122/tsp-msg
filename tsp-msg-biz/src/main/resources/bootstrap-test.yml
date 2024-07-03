@@ -1,0 +1,42 @@
+server:
+  port: 7012
+
+xxl:
+  job:
+    admin:
+      addresses: https://tsp-t.hycan.com.cn/xxl-job-admin
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://139.9.72.201:30013
+        namespace: b5a05c17-fff9-400a-b1ce-bc79c8981eaf
+        group: tsp
+        username: nacos
+        password: hycan@_666
+      config:
+        username: nacos
+        password: hycan@_666
+        server-addr: http://139.9.72.201:30013
+        file-extension: yml
+        shared-configs:
+          - application-test.yml
+        group: tsp
+        namespace: b5a05c17-fff9-400a-b1ce-bc79c8981eaf
+
+feign:
+  skew:
+    domain: https://tsp-t.hycan.com.cn
+    enable: true
+    service:
+      url:
+        tsp-vms-biz: https://tsp-t.hycan.com.cn/tsp-api/vms
+        tsp-condition-biz: https://tsp-t.hycan.com.cn/tsp-api/condition
+        tsp-alarm-biz: https://tsp-t.hycan.com.cn/tsp-api/alarm-biz
+security:
+  oauth2:
+    ignore:
+      urls:
+        - /**

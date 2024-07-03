@@ -1,0 +1,232 @@
+[
+	{
+		"buss_type": "ABNORMAL_ALARM",
+		"desc": "异常告警",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "g05", "G05", "gn01", "GN01", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "SEND_POI",
+		"desc": "发送POI配置",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 1,
+				"topic": "{serial}/{vin}/avnt/send_poi_down",
+				"direction": "down",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "IMAGE_TEXT_MSG",
+		"desc": "发送图文消息",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 1,
+				"topic": "{serial}/{vin}/avnt/image_text_msg_down",
+				"direction": "down",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "FLOW_ALARM",
+		"desc": "流量告警",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "AUTH_EXPIRE",
+		"desc": "授权到期",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "DATA_MSG",
+		"desc": "发送数据消息配置",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 1,
+				"topic": "{serial}/{vin}/avnt/data_msg_down",
+				"direction": "down",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "REPLACEMENT",
+		"desc": "售后换件",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G05", "G06", "GN01", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "OTA",
+		"desc": "OTA任务/状态/结果",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "VEHICLE_CONDITION",
+		"desc": "车控车况",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "REAL_NAME",
+		"desc": "实名认证",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G05", "G06", "GN01", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "VEHICLE_CONTROL",
+		"desc": "车控指令",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "g06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "COLLECT_APP_MSG",
+		"desc": "车机应用埋点数据上传消息",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 0,
+				"topic": "{serial}/{vin}/avnt/collect_app_up",
+				"direction": "up",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "g06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "COLLECT_RESOURCE_MSG",
+		"desc": "车机硬件资源数据上传消息",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 1,
+				"topic": "{serial}/{vin}/avnt/collect_resource_up",
+				"direction": "up",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "VEHICLE_CONDITION_REPORT",
+		"desc": "事件型车况",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"routingKey": "vcp",
+				"target": "VCP"
+			}
+		],
+		"serials": ["G06", "G05", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "VEHICLE_STATUS",
+		"desc": "同步车辆状态扭转",
+		"serials": ["G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "COLLECT_SYS_MSG",
+		"desc": "车机系统埋点数据上传消息",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 0,
+				"topic": "{serial}/{vin}/avnt/collect_system_up",
+				"direction": "up",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "COLLECT_MSG",
+		"desc": "采集配置消息",
+		"forward_configs": [
+			{
+				"protocol": "MQTT",
+				"qos": 1,
+				"topic": "{serial}/{vin}/avnt/collect_data_down",
+				"direction": "down",
+				"target": "AVNT"
+			},
+			{
+				"protocol": "MQTT",
+				"qos": 0,
+				"topic": "{serial}/{vin}/avnt/collect_data_up",
+				"direction": "up",
+				"target": "AVNT"
+			}
+		],
+		"serials": ["G06", "G06-A", "G08", "G05-A"]
+	},
+	{
+		"buss_type": "SENTRY_MODEL",
+		"desc": "哨兵模式",
+		"forward_configs": [
+			{
+				"protocol": "RABBITMQ",
+				"target": "[\"VCP\"]",
+				"routingKey": "vcp"
+			}
+		],
+		"serials": ["G06", "G05", "g05", "G05", "G08", "G05-A"]
+	}
+]

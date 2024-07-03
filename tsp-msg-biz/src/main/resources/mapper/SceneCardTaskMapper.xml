@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.SceneCardTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.SceneCardTaskEntity">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="baseTaskId" jdbcType="BIGINT" column="base_task_id"/>
+        <result property="execPlan" jdbcType="VARCHAR" column="exec_plan"/>
+        <result property="planTime" jdbcType="TIMESTAMP" column="plan_time"/>
+        <result property="duration" jdbcType="BIGINT" column="duration"/>
+        <result property="actions" jdbcType="OTHER" column="actions" typeHandler="com.hycan.idn.tsp.message.utils.JSONTypeHandlerPg"/>
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="updateTime" jdbcType="TIMESTAMP" column="update_time"/>
+        <result property="createBy" jdbcType="VARCHAR" column="create_by"/>
+        <result property="updateBy" jdbcType="VARCHAR" column="update_by"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        base_task_id, resource_id, exec_plan, plan_time, duration, actions
+    </sql>
+
+    <select id="selectBaskTaskIdById" resultType="java.lang.Long">
+        SELECT base_task_id FROM scene_card_task_info WHERE id = #{id} 1 = 1
+    </select>
+
+    <select id="selectTspMsgTaskSceneList" resultType="com.hycan.idn.tsp.message.pojo.scenecardtask.SceneCardTaskRspVO">
+        SELECT scene.id, scene.base_task_id, scene.exec_plan, scene.plan_time, scene.duration, base.task_name,
+        base.msg_title, base.msg_content, base.exec_policy, base.status, base.scope, base.publish_time, base.send_time,
+        base.cancel_time, base.finish_time, base.create_time, base.update_time, base.create_by, base.update_by
+        FROM `tsp_msg_task_scene` scene
+        INNER JOIN `tsp_msg_task_base` base ON scene.base_task_id = base.id
+        <where>
+            1 = 1 AND base.status = #{query.status} AND scene.plan_time BETWEEN #{query.sendStartTime} AND
+            #{query.sendEndTime}
+        </where>
+    </select>
+
+    <select id="selectTspMsgTaskSceneById" parameterType="Long" resultType="com.hycan.idn.tsp.message.pojo.scenecardtask.SceneCardTaskRspVO">
+        SELECT scene.id, scene.base_task_id, scene.exec_plan, scene.plan_time, scene.duration, base.task_name, base.msg_title, base.msg_content, base.exec_policy, base.status, base.scope, base.publish_time, base.send_time, base.cancel_time, base.finish_time, base.create_time, base.update_time, base.create_by, base.update_by
+        FROM `tsp_msg_task_scene` scene
+        INNER JOIN `tsp_msg_task_base` base ON scene.base_task_id = base.id WHERE 1 = 1 AND scene.id = #{id};
+    </select>
+
+    <select id="selectTspMsgResourceBySceneId" resultType="com.hycan.idn.tsp.message.pojo.scenecardtask.SceneResourceRspDTO">
+        SELECT resource.id resource_id, resource.resource_type, resource.resource_url, resource.source
+        FROM `tsp_msg_task_scene` scene
+        INNER JOIN `tsp_msg_scene_resource` scene_resource ON scene_resource.scene_id = scene.id
+        INNER JOIN tsp_msg_resource resource ON scene_resource.resource_id = resource.id
+        WHERE 1 = 1 AND scene.id = #{id}
+    </select>
+    <select id="selectTspMsgResourceBySceneIds" resultType="com.hycan.idn.tsp.message.pojo.scenecardtask.SceneResourceRspDTO">
+        SELECT scene.id scene_id, resource.id resource_id, resource.resource_type, resource.resource_url, resource.source
+        FROM `tsp_msg_task_scene` scene
+        INNER JOIN `tsp_msg_scene_resource` scene_resource ON scene_resource.scene_id = scene.id
+        INNER JOIN tsp_msg_resource resource ON scene_resource.resource_id = resource.id
+        WHERE 1 = 1 AND scene.id IN
+        <foreach collection="list" index="index" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="isResourceConfigRelationSendingTask" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM scene_card_task_info cti
+                              LEFT JOIN base_task_info tbi ON tbi.id = cti.base_task_id
+                              LEFT JOIN task_resource_relation trr ON cti.base_task_id = trr.base_task_id
+            WHERE 1 = 1
+              AND trr.resource_id = #{resource_config_id}
+              AND tbi.status = 'SENDING'
+        ) AS result
+    </select>
+
+    <select id="isResourceConfigRelationTask" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM scene_card_task_info cti
+                      LEFT JOIN base_task_info tbi ON tbi.id = cti.base_task_id
+                      LEFT JOIN task_resource_relation trr ON cti.base_task_id = trr.base_task_id
+            WHERE 1 = 1
+              AND trr.resource_id = #{resource_config_id}
+        ) AS result
+    </select>
+
+    <select id="findTaskRspById" resultType="com.hycan.idn.tsp.message.pojo.scenecardtask.SceneCardTaskRspVO">
+        SELECT cti.id, cti.base_task_id, cti.exec_plan, cti.plan_time, cti.duration, bti.task_name,
+               bti.msg_title, bti.msg_content, bti.exec_policy, bti.status, bti.scope, bti.publish_time, bti.send_time,
+               bti.cancel_time, bti.finish_time, cti.create_time, cti.update_time, cti.create_by, cti.update_by
+        FROM scene_card_task_info cti
+                 LEFT JOIN base_task_info bti ON cti.base_task_id = bti.id
+        WHERE cti.id = #{id}
+        ORDER BY cti.create_time DESC
+    </select>
+
+    <select id="findPage" resultType="com.hycan.idn.tsp.message.pojo.scenecardtask.SceneCardTaskRspVO">
+        SELECT cti.id, cti.base_task_id, cti.exec_plan, cti.plan_time, cti.duration, bti.task_name, cti.actions,
+        bti.msg_title, bti.msg_content, bti.exec_policy, bti.status, bti.scope, bti.publish_time, bti.send_time,
+        bti.cancel_time, bti.finish_time, cti.create_time, cti.update_time, cti.create_by, cti.update_by
+        FROM scene_card_task_info cti
+        LEFT JOIN base_task_info bti ON cti.base_task_id = bti.id
+        <where>
+            1 = 1
+            <if test="query.taskName != null and query.taskName != ''">
+                AND bti.task_name LIKE concat('%', #{query.taskName}, '%')
+            </if>
+            <if test="query.status != null and query.status !=''">
+                AND bti.status = #{query.status}
+            </if>
+            <if test="query.sendStartTime != null">
+                AND bti.send_time &gt;= #{query.sendStartTime}
+            </if>
+            <if test="query.sendEndTime != null">
+                AND bti.send_time &lt;= #{query.sendEndTime}
+            </if>
+        </where>
+        ORDER BY cti.create_time DESC
+    </select>
+
+    <select id="findPublishedTask" resultType="com.hycan.idn.tsp.message.pojo.publishtask.SceneCardTaskPublishedDTO">
+        SELECT scti.id AS scene_card_task_id, scti.base_task_id, bti.task_name, bti.msg_content, bti.msg_title, bti.exec_policy,
+               scti.plan_time AS start_time, (scti.plan_time + scti.duration * INTERVAL '1 SECOND') AS end_time,
+               scti.actions, bti.scope
+        FROM scene_card_task_info scti
+                 LEFT JOIN base_task_info bti ON scti.base_task_id = bti.id
+        WHERE 1 = 1
+          AND bti.status = 'PUBLISHED'
+          AND bti.task_type = 'SCENE_CARD'
+          AND scti.plan_time &lt;= NOW()
+          AND (scti.plan_time + scti.duration * INTERVAL '1 SECOND') &gt;= NOW()
+        ORDER BY bti.create_time DESC
+    </select>
+
+    <insert id="insertTask">
+        INSERT INTO scene_card_task_info(id, base_task_id, exec_plan, plan_time, duration, actions, create_time, update_time, create_by, update_by)
+        VALUES (#{id}, #{baseTaskId}, #{execPlan}, #{planTime}, #{duration},
+                #{actions, javaType=Object, jdbcType=OTHER, typeHandler=com.hycan.idn.tsp.message.utils.JSONTypeHandlerPg},
+                #{createTime}, #{updateTime}, #{createBy}, #{updateBy})
+    </insert>
+</mapper>

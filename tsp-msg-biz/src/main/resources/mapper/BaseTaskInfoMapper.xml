@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.BaseTaskInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.BaseTaskInfoEntity">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="taskName" jdbcType="VARCHAR" column="task_name"/>
+        <result property="taskType" jdbcType="VARCHAR" column="task_type"/>
+        <result property="msgTitle" jdbcType="VARCHAR" column="msg_title"/>
+        <result property="msgContent" jdbcType="VARCHAR" column="msg_content"/>
+        <result property="execPolicy" jdbcType="VARCHAR" column="exec_policy"/>
+        <result property="status" jdbcType="VARCHAR" column="status"/>
+        <result property="scope" jdbcType="VARCHAR" column="scope"/>
+        <result property="publishTime" jdbcType="TIMESTAMP" column="publish_time"/>
+        <result property="sendTime" jdbcType="TIMESTAMP" column="send_time"/>
+        <result property="cancelTime" jdbcType="TIMESTAMP" column="cancel_time"/>
+        <result property="finishTime" jdbcType="TIMESTAMP" column="finish_time"/>
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="updateTime" jdbcType="TIMESTAMP" column="update_time"/>
+        <result property="createBy" jdbcType="VARCHAR" column="create_by"/>
+        <result property="updateBy" jdbcType="VARCHAR" column="update_by"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, task_name, msg_title, msg_content, exec_policy, status, scope, publish_time, send_time, cancel_time, finish_time
+    </sql>
+
+    <update id="updateStatusFinishedByFinishTime">
+        UPDATE base_task_info SET status = 'FINISHED' WHERE finish_time &lt; NOW()
+    </update>
+
+    <update id="updateTaskStatusSending">
+        UPDATE base_task_info SET status = 'SENDING' WHERE id=#{id}
+    </update>
+
+    <select id="findStatusFinishedByFinishTime" resultType="java.lang.Long">
+        SELECT id FROM base_task_info WHERE finish_time >= #{yesterday}
+    </select>
+
+    <select id="findStatusById" resultType="java.lang.String">
+        SELECT status FROM base_task_info WHERE id =#{id}
+    </select>
+
+    <select id="isExists" resultType="boolean" >
+        SELECT EXISTS(
+            SELECT 1 FROM base_task_info WHERE task_name = #{task_name}
+        ) AS result
+    </select>
+
+</mapper>

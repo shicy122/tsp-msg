@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hycan.idn.tsp.message.repository.mysql.HolidayConfigMapper">
+    <resultMap id="BaseResultMap" type="com.hycan.idn.tsp.message.entity.mysql.HolidayConfigEntity">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="holidayName" jdbcType="VARCHAR" column="holiday_name"/>
+        <result property="holidayType" jdbcType="VARCHAR" column="holiday_type"/>
+        <result property="year" jdbcType="INTEGER" column="year"/>
+        <result property="status" jdbcType="VARCHAR" column="status"/>
+        <result property="startDate" jdbcType="TIMESTAMP" column="start_date"/>
+        <result property="endDate" jdbcType="TIMESTAMP" column="end_date"/>
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="updateTime" jdbcType="TIMESTAMP" column="update_time"/>
+        <result property="createBy" jdbcType="VARCHAR" column="create_by"/>
+        <result property="updateBy" jdbcType="VARCHAR" column="update_by"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, holiday_name, holiday_type, year, status, start_date, end_date, create_by, create_time, update_by, update_time
+    </sql>
+
+    <update id="updateStatusDisableByEndDate">
+        UPDATE holiday_config SET status = 'DISABLE' WHERE end_date &lt; CURRENT_DATE
+    </update>
+
+    <select id="findHolidayNameById" resultType="java.lang.String">
+        SELECT holiday_name FROM holiday_config WHERE id = #{id}
+    </select>
+
+    <select id="isExists" resultType="boolean" >
+        SELECT EXISTS(
+                   SELECT 1 FROM holiday_config WHERE holiday_name = #{holiday_name} AND year = #{year}
+        ) AS result
+    </select>
+
+    <update id="updateStatusById">
+        UPDATE holiday_config SET status = #{status} WHERE id=#{id}
+    </update>
+
+    <select id="findPage" resultType="com.hycan.idn.tsp.message.pojo.holidayconfig.HolidayConfigRspVO">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM holiday_config
+        WHERE 1 = 1
+        <if test="query.holidayName != null and '' neq query.holidayName">
+            AND holiday_name = #{query.holidayName}
+        </if>
+        <if test="query.holidayType != null and '' neq query.holidayType">
+            AND holiday_type = #{query.holidayType}
+        </if>
+        <if test="query.status != null and '' neq query.status">
+            AND status = #{query.status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertOrUpdate">
+        INSERT INTO holiday_config(id, holiday_name, holiday_type, year, status, start_date, end_date, create_by, create_time, update_by, update_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=','>
+            (#{item.id}, #{item.holidayName}, #{item.holidayType}, #{item.year}, #{item.status}, #{item.startDate},
+            #{item.endDate}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime})
+        </foreach>
+        ON CONFLICT (year, holiday_name) DO UPDATE
+        SET
+        holiday_type = EXCLUDED.holiday_type,
+        status = EXCLUDED.status,
+        start_date = EXCLUDED.start_date,
+        end_date = EXCLUDED.end_date,
+        update_by = EXCLUDED.update_by,
+        update_time = EXCLUDED.update_time;
+    </insert>
+</mapper>
